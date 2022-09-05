@@ -1,25 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import * as React from 'react';
+import {render} from 'react-dom';
+import Map, {Marker} from 'react-map-gl';
+
+import 'mapbox-gl/dist/mapbox-gl.css';
+
+const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX; // Set your mapbox token here
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Map
+      initialViewState={{
+        latitude: 	51.509865,
+        longitude: -0.118092,
+        zoom: 5
+      }}
+      style={{width: "100vw", height: "100vh",}}
+      mapStyle="mapbox://styles/mapbox/streets-v9"
+      mapboxAccessToken={MAPBOX_TOKEN}
+    >
+
+    </Map>
   );
 }
+
+
 
 export default App;
