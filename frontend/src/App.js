@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import {render} from 'react-dom';
 import Map, {Marker, Popup} from 'react-map-gl';  
-import { LineAxisOutlined, Room, Star } from '@mui/icons-material';
+import { Room, Star } from '@mui/icons-material';
 import "./app.css";
 import axios from "axios";
+import { format } from 'timeago.js';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { getOffsetLeft } from '@mui/material';
@@ -11,9 +11,10 @@ import { getOffsetLeft } from '@mui/material';
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX; // Set your mapbox token here
 
 function App() {
-
+  const currentUser = "nela";
   const [pins, setPins] = useState([]);
-  const [showPopup, setShowPopup] = useState(true);
+  const [currentPlaceId, setCurrentPlaceId] = useState(null);
+  const [newPlace, setNewPlace] = useState(null);
 
 
   useEffect(() => {
@@ -32,6 +33,19 @@ function App() {
 
   },[]);
 
+  const handleMarkerClick = (id) => {
+    setCurrentPlaceId(id);
+  }
+
+  const handleAddClick= (e) => {
+    console.log(e);
+    const [lat, long] = e.lngLat;
+    setNewPlace({
+      lat:lat,
+      long:long,
+    });
+  }
+
 
   return (
     <Map
@@ -43,6 +57,7 @@ function App() {
       style={{width: "100vw", height: "100vh",}}
       mapStyle="mapbox://styles/mapbox/streets-v9"
       mapboxAccessToken={MAPBOX_TOKEN}
+      onDblClick = {handleAddClick}
     >
 
 
@@ -50,17 +65,23 @@ function App() {
 
 <>
     <Marker longitude={p.long} latitude={p.lat} anchor="bottom" >
-      <Room style={{fontsize: "large",color: "slateblue"}}/>
+      <Room 
+      style = {{color: p.username === currentUser ? "slateblue" : "tomato", cursor: "pointer"}}
+      onClick = {() => handleMarkerClick(p._id)}
+      />
     </Marker>
-
-   {/*  <Popup longitude={-0.118092} latitude={51.509865}
-        anchor="left"
-        onClose={() => setShowPopup(false)}>
+    {p._id === currentPlaceId && (
+    <Popup 
+      longitude={p.long} 
+      latitude={p.lat}
+      anchor="left"
+      onClose={() => setCurrentPlaceId(null)}
+      >
         <div className="card">
           <label>Place</label>
-          <h4 className="place">London</h4>
+          <h4 className="place">{p.title}</h4>
           <label>Review</label>
-          <p className="desc">Beautiful city. I love it.</p>
+          <p className="desc">{p.desc}</p>
           <label>Rating</label>
           <div className="stars">
 
@@ -72,13 +93,25 @@ function App() {
 
         </div>
           <label>Information</label>
-          <span className="username">Created by <b>nela</b></span>
-          <span className="date">1 hour ago</span>
+          <span className="username">Created by <b>{p.username}</b></span>
+          <span className="date">{format(p.createdAt)}</span>
         </div>
-      </Popup> */}
+      </Popup>
+    )}
 </>
-      ))};
-
+      ))}
+      {newPlace && (
+      <Popup 
+        latitude={newPlace.lat}
+        longitude={newPlace.long} 
+        closeButton = {true}
+        closeOnClick = {false}
+        anchor="left"
+        onClose={() => setCurrentPlaceId(null)}
+      >
+        hello
+      </Popup>
+    )}
     </Map>
   );
 }
