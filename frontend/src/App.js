@@ -1,25 +1,31 @@
 import { useEffect, useState } from "react";
-import Map, {Marker, Popup} from 'react-map-gl';  
+import Map, { Marker, Popup } from 'react-map-gl';  
 import { Room, Star } from '@mui/icons-material';
 import "./app.css";
 import axios from "axios";
 import { format } from 'timeago.js';
-
+import Register from "./components/Register";
+import Login from "./components/Login";
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { getOffsetLeft } from '@mui/material';
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX; // Set your mapbox token here
 
 function App() {
-  const currentUser = "nela";
+  const myStorage = window.localStorage;
+
+  const [currentUser, setCurrentUser] = useState(myStorage.getItem("user"));
+
   const [pins, setPins] = useState([]);
   const [currentPlaceId, setCurrentPlaceId] = useState(null);
   const [newPlace, setNewPlace] = useState(null);
 
   const [title, setTitle] = useState(null);
   const [desc, setDesc] = useState(null);
+  const [imgURL, setImgURL] = useState(null);
   const [rating, setRating] = useState(0);
 
+  const [showRegister, setShowRegister] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
 
   useEffect(() => {
@@ -57,6 +63,7 @@ function App() {
       rating,
       lat: newPlace.lat,
       long: newPlace.long,
+      imgURL,
     }
     try{
         const res = await axios.post("/pins", newPin)
@@ -67,6 +74,12 @@ function App() {
     }
   }
 
+
+
+  const handleLogout =() => {
+    myStorage.removeItem("user");
+    setCurrentUser(null);
+  }
 
   return (
     <Map
@@ -108,11 +121,17 @@ function App() {
           <div className="stars">
 
           {Array(p.rating).fill(<Star className="star"/>)}
-
-        </div>
+          </div>
+          <label>Image</label>
+          <img 
+            className="image"
+            src={p.imgURL}
+            alt="new"
+            />
           <label>Information</label>
           <span className="username">Created by <b>{p.username}</b></span>
           <span className="date">{format(p.createdAt)}</span>
+
         </div>
       </Popup>
     )}
@@ -129,12 +148,12 @@ function App() {
         anchor="left"
         onClose={() => setNewPlace(null)}
       >
-        <div>
+        <div >
           <form onSubmit={handleSubmit}>
             <label>Title</label>
             <input placeholder="Enter a title.." onChange={(e) => setTitle(e.target.value)}/>
             <label>Review</label>
-            <textarea placeholder="Write something about this place..." onChange={(e) => setDesc(e.target.value)}/>
+            <textarea placeholder="Write something about this place.." onChange={(e) => setDesc(e.target.value)}/>
             <label>Rating</label>
             <select onChange={(e) => setRating(e.target.value)}>
               <option value="1">1</option>
@@ -143,12 +162,40 @@ function App() {
               <option value="4">4</option>
               <option value="5">5</option>
             </select>
+            <label>Image</label>
+            <textarea placeholder=" Enter Image URL.." onChange={(e) => setImgURL(e.target.value)}/>
+            
+
             <button className="submitButton">Add Pin</button>
           </form>
         </div>
       </Popup>
-
     )}
+
+      {currentUser ? (
+      <button className="button logout" onClick={handleLogout}>Log out</button>
+      ) : (
+        <div className="buttons">
+
+          <button 
+          className="button login" 
+          onClick={() => setShowLogin(true)}
+          >
+            Login
+          </button>
+
+          <button 
+          className="button register" 
+          onClick={() => setShowRegister(true)}
+          >
+            Register
+          </button>
+        </div>
+      )}
+      
+        {showRegister && <Register setShowRegister={setShowRegister}/>}
+        {showLogin && <Login setShowLogin={setShowLogin} myStorage={myStorage} setCurrentUser={setCurrentUser}/>}
+        
     </Map>
   );
 }

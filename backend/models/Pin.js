@@ -11,26 +11,29 @@ const PinSchema = new mongoose.Schema(
         require: true,
         min: 3,
       },
-      desc: {
+    desc: {
         type: String,
         require: true,
       },
-      rating: {
+    rating: {
         type: Number,
         require: true,
         min: 0,
         max: 5,
       },
-      lat:{
+    lat:{
         type: Number,
         require: true,
       },
-      long: {
+    long: {
         type: Number,
         required: true,
-      }
+      },
+    imgURL: {
+        type: String,
+        require: true,
+    }
   },
   { timestamps: true }
 );
-
 module.exports = mongoose.model("Pin", PinSchema);
