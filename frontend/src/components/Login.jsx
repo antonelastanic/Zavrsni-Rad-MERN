@@ -22,6 +22,7 @@ export default function Login({setShowLogin, setCurrentUser, myStorage}){
 
         try{
             const res = await axios.post("/users/login", user);
+            console.log(res.data.username)
             myStorage.setItem('user', res.data.username);
             setCurrentUser(res.data.username);
             setShowLogin(false);
