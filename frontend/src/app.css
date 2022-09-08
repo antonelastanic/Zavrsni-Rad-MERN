@@ -1,6 +1,6 @@
 .card{
     width: 400px;
-    height: 650px;
+    height: 600px;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -87,6 +87,6 @@ input::placeholder, textarea::placeholder{
 }
 
 .image{
-    max-height: 400;
+    max-height: 300px;
     width: auto;
 }
